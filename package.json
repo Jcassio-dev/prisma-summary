@@ -1,0 +1,111 @@
+{
+  "name": "prisma-sorter",
+  "displayName": "prisma-sorter",
+  "description": "Sort Prisma schema files and navigate through models and enums easily",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.98.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:prisma-sorter.sortPrisma",
+    "onCommand:prisma-sorter.showSummary",
+    "onCommand:prisma-sorter.refreshEntry",
+    "onCommand:prisma-sorter.sortAndRefresh",
+    "onView:prismaSummary"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "prisma",
+        "aliases": [
+          "Prisma",
+          "prisma"
+        ],
+        "extensions": [
+          ".prisma"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "prismaSorter",
+          "title": "Prisma Sorter",
+          "icon": "resources/prisma-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "prismaSorter": [
+        {
+          "id": "prismaSummary",
+          "name": "Prisma Summary"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "prisma-sorter.sortAndRefresh",
+          "when": "view == prismaSummary",
+          "group": "navigation"
+        },
+        {
+          "command": "prisma-sorter.refreshEntry",
+          "when": "view == prismaSummary",
+          "group": "navigation"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "prisma-sorter.sortPrisma",
+        "title": "Sort Prisma File"
+      },
+      {
+        "command": "prisma-sorter.showSummary",
+        "title": "Show Prisma Summary"
+      },
+      {
+        "command": "prisma-sorter.refreshEntry",
+        "title": "Refresh Prisma Summary",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "prisma-sorter.sortAndRefresh",
+        "title": "Sort Prisma File and Refresh",
+        "icon": "$(sort-precedence)"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.98.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
+    "@typescript-eslint/parser": "^8.25.0",
+    "eslint": "^9.21.0",
+    "typescript": "^5.7.3",
+    "ts-loader": "^9.5.2",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}
