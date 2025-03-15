@@ -143,6 +143,12 @@ export class CategoryItem extends PrismaItem {
   ) {
     super(label, collapsibleState);
     this.contextValue = "category";
+    
+    if (label === "Models") {
+      this.iconPath = new vscode.ThemeIcon("database");
+    } else if (label === "Enums") {
+      this.iconPath = new vscode.ThemeIcon("symbol-enum");
+    }
   }
 }
 
@@ -154,6 +160,7 @@ export class ModelItem extends PrismaItem {
   ) {
     super(label, collapsibleState);
     this.contextValue = "model";
+    this.iconPath = new vscode.ThemeIcon("table");
   }
 }
 
@@ -165,5 +172,6 @@ export class EnumItem extends PrismaItem {
   ) {
     super(label, collapsibleState);
     this.contextValue = "enum";
+    this.iconPath = new vscode.ThemeIcon("symbol-enum-member");
   }
 }

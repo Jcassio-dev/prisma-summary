@@ -14,50 +14,10 @@ export class PrismaWebViewProvider {
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Prisma Summary</title>
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-              padding: 0 20px;
-            }
-            button {
-              background-color: #007acc;
-              border: none;
-              color: white;
-              padding: 8px 16px;
-              text-align: center;
-              text-decoration: none;
-              display: inline-block;
-              font-size: 14px;
-              margin: 4px 2px;
-              cursor: pointer;
-              border-radius: 2px;
-            }
-            a {
-              color: #007acc;
-              text-decoration: none;
-            }
-            a:hover {
-              text-decoration: underline;
-            }
-            .footer {
-              margin-top: 20px;
-              font-size: 12px;
-              color: #888;
-            }
-          </style>
       </head>
       <body>
-          <button onclick="refresh()">Sort Again</button>
           ${summary.join('\n')}
-          <div class="footer">
-            <a href="https://github.com/your-repo/prisma-summary">Star this project on GitHub!</a>
-          </div>
-          <script>
-              const vscode = acquireVsCodeApi();
-              function refresh() {
-                  vscode.postMessage({ command: 'refresh' });
-              }
-          </script>
+        
       </body>
       </html>
     `;
