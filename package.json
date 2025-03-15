@@ -1,6 +1,6 @@
 {
-  "name": "prisma-sorter",
-  "displayName": "prisma-sorter",
+  "name": "prisma-summary",
+  "displayName": "prisma-summary",
   "description": "Sort Prisma schema files and navigate through models and enums easily",
   "version": "0.0.1",
   "engines": {
@@ -10,10 +10,10 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:prisma-sorter.sortPrisma",
-    "onCommand:prisma-sorter.showSummary",
-    "onCommand:prisma-sorter.refreshEntry",
-    "onCommand:prisma-sorter.sortAndRefresh",
+    "onCommand:prisma-summary.sortPrisma",
+    "onCommand:prisma-summary.showSummary",
+    "onCommand:prisma-summary.refreshEntry",
+    "onCommand:prisma-summary.sortAndRefresh",
     "onView:prismaSummary"
   ],
   "main": "./dist/extension.js",
@@ -34,14 +34,14 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "prismaSorter",
-          "title": "Prisma Sorter",
-          "icon": "resources/prisma-icon.svg"
+          "id": "prismaSummary",
+          "title": "PrismaSummary",
+          "icon": "resources/icon.svg"
         }
       ]
     },
     "views": {
-      "prismaSorter": [
+      "prismaSummary": [
         {
           "id": "prismaSummary",
           "name": "Prisma Summary"
@@ -51,12 +51,12 @@
     "menus": {
       "view/title": [
         {
-          "command": "prisma-sorter.sortAndRefresh",
+          "command": "prisma-summary.sortAndRefresh",
           "when": "view == prismaSummary",
           "group": "navigation"
         },
         {
-          "command": "prisma-sorter.refreshEntry",
+          "command": "prisma-summary.refreshEntry",
           "when": "view == prismaSummary",
           "group": "navigation"
         }
@@ -64,20 +64,20 @@
     },
     "commands": [
       {
-        "command": "prisma-sorter.sortPrisma",
+        "command": "prisma-summary.sortPrisma",
         "title": "Sort Prisma File"
       },
       {
-        "command": "prisma-sorter.showSummary",
+        "command": "prisma-summary.showSummary",
         "title": "Show Prisma Summary"
       },
       {
-        "command": "prisma-sorter.refreshEntry",
+        "command": "prisma-summary.refreshEntry",
         "title": "Refresh Prisma Summary",
         "icon": "$(refresh)"
       },
       {
-        "command": "prisma-sorter.sortAndRefresh",
+        "command": "prisma-summary.sortAndRefresh",
         "title": "Sort Prisma File and Refresh",
         "icon": "$(sort-precedence)"
       }

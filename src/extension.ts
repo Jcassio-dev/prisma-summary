@@ -1,23 +1,21 @@
 import * as vscode from 'vscode';
 import { PrismaSummaryProvider } from './PrismaSummaryProvider';
+import { PrismaContentSorter } from './PrismaContentSorter';
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Congratulations, your extension "prisma-sorter" is now active!');
+    console.log('Congratulations, your extension "prisma-summary" is now active!');
 
     const prismaSummaryProvider = new PrismaSummaryProvider(vscode.workspace.rootPath);
     vscode.window.registerTreeDataProvider('prismaSummary', prismaSummaryProvider);
     
-    // Register refresh command
-    const refreshCommand = vscode.commands.registerCommand('prisma-sorter.refreshEntry', async () => {
+    const refreshCommand = vscode.commands.registerCommand('prisma-summary.refreshEntry', async () => {
         prismaSummaryProvider.refresh();
         vscode.window.showInformationMessage('Prisma summary refreshed!');
     });
 
-    // Register sort and refresh command
-    const sortAndRefreshCommand = vscode.commands.registerCommand('prisma-sorter.sortAndRefresh', async () => {
+    const sortAndRefreshCommand = vscode.commands.registerCommand('prisma-summary.sortAndRefresh', async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
-            // Try to find and open a Prisma file
             const prismaFiles = await vscode.workspace.findFiles('**/*.prisma', '**/node_modules/**');
             if (prismaFiles.length > 0) {
                 const document = await vscode.workspace.openTextDocument(prismaFiles[0]);
@@ -39,7 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
         prismaSummaryProvider.refresh();
     });
 
-    const sortPrismaDisposable = vscode.commands.registerCommand('prisma-sorter.sortPrisma', async () => {
+    const sortPrismaDisposable = vscode.commands.registerCommand('prisma-summary.sortPrisma', async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
             vscode.window.showErrorMessage('No active editor found!');
@@ -55,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
         await sortPrismaFile(document);
     });
 
-    const showSummaryDisposable = vscode.commands.registerCommand('prisma-sorter.showSummary', async () => {
+    const showSummaryDisposable = vscode.commands.registerCommand('prisma-summary.showSummary', async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
             vscode.window.showErrorMessage('No active editor found!');
@@ -103,49 +101,13 @@ async function sortPrismaFile(document: vscode.TextDocument): Promise<void> {
     vscode.window.showInformationMessage('Prisma file sorted successfully!');
 }
 
-function sortPrismaContent(text: string): string {
-    const lines = text.split('\n');
-    const models: string[] = [];
-    const enums: string[] = [];
-    let otherLines: string[] = [];
 
-    let currentBlock: string[] = [];
-    let currentType: 'model' | 'enum' | 'other' = 'other';
-
-    for (const line of lines) {
-        if (line.startsWith('model ')) {
-            if (currentBlock.length > 0) {
-                if (currentType === 'model') models.push(currentBlock.join('\n'));
-                else if (currentType === 'enum') enums.push(currentBlock.join('\n'));
-                else otherLines = otherLines.concat(currentBlock);
-            }
-            currentBlock = [line];
-            currentType = 'model';
-        } else if (line.startsWith('enum ')) {
-            if (currentBlock.length > 0) {
-                if (currentType === 'model') models.push(currentBlock.join('\n'));
-                else if (currentType === 'enum') enums.push(currentBlock.join('\n'));
-                else otherLines = otherLines.concat(currentBlock);
-            }
-            currentBlock = [line];
-            currentType = 'enum';
-        } else {
-            currentBlock.push(line);
-        }
-    }
-
-    if (currentBlock.length > 0) {
-        if (currentType === 'model') models.push(currentBlock.join('\n'));
-        else if (currentType === 'enum') enums.push(currentBlock.join('\n'));
-        else otherLines = otherLines.concat(currentBlock);
-    }
-
-    models.sort();
-    enums.sort();
-
-    return [ ...otherLines, ...models, ...enums].join('\n');
-}
-
+  
+  function sortPrismaContent(text: string): string {
+    const sorter = new PrismaContentSorter();
+    return sorter.sort(text);
+  }
+  
 function generateSummary(text: string): string[] {
     const lines = text.split('\n');
     const modelSummary: string[] = ['<h2>Models</h2><ul>'];
@@ -178,7 +140,7 @@ function getWebviewContent(summary: string[]): string {
         <body>
             <button onclick="refresh()">Sort Again</button>
             ${summary.join('\n')}
-            <a href="https://github.com/your-repo/prisma-sorter">Star this project!</a>
+            <a href="https://github.com/your-repo/prisma-summary">Star this project!</a>
             <script>
                 function refresh() {
                     const vscode = acquireVsCodeApi();

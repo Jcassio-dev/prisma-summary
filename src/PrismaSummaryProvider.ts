@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 export class PrismaSummaryProvider implements vscode.TreeDataProvider<PrismaItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<PrismaItem | undefined | void> = new vscode.EventEmitter<PrismaItem | undefined | void>();
@@ -27,7 +26,6 @@ export class PrismaSummaryProvider implements vscode.TreeDataProvider<PrismaItem
             return Promise.resolve([]);
         }
 
-        // If no element is provided, return top-level categories
         if (!element) {
             return [
                 new CategoryItem('Models', vscode.TreeItemCollapsibleState.Expanded),
@@ -35,7 +33,6 @@ export class PrismaSummaryProvider implements vscode.TreeDataProvider<PrismaItem
             ];
         }
 
-        // If element is a category, return its children
         if (element instanceof CategoryItem) {
             return this.getModelsOrEnums(prismaFilePath, element.label);
         }
@@ -112,10 +109,6 @@ export class ModelItem extends PrismaItem {
     ) {
         super(label, collapsibleState);
         this.contextValue = 'model';
-        this.iconPath = {
-            light: vscode.Uri.file(path.join(__filename, '..', '..', 'resources', 'light', 'model.svg')),
-            dark: vscode.Uri.file(path.join(__filename, '..', '..', 'resources', 'dark', 'model.svg'))
-        };
     }
 }
 
@@ -128,9 +121,5 @@ export class EnumItem extends PrismaItem {
     ) {
         super(label, collapsibleState);
         this.contextValue = 'enum';
-        this.iconPath = {
-            light: vscode.Uri.file(path.join(__filename, '..', '..', 'resources', 'light', 'enum.svg')),
-            dark: vscode.Uri.file(path.join(__filename, '..', '..', 'resources', 'dark', 'enum.svg'))
-        };
     }
 }
