@@ -2,9 +2,13 @@
   "name": "prisma-summary",
   "displayName": "prisma-summary",
   "description": "Sort Prisma schema files and navigate through models and enums easily",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "Jcassio-dev",
   "icon": "resources/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jcassio-dev/prisma-summary.git"
+  },
   "engines": {
     "vscode": "^1.98.0"
   },
