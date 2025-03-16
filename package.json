@@ -2,8 +2,9 @@
   "name": "prisma-summary",
   "displayName": "prisma-summary",
   "description": "Sort Prisma schema files and navigate through models and enums easily",
-  "version": "0.0.1",
-  "publisher": "Jcassio-dev",  
+  "version": "0.0.2",
+  "publisher": "Jcassio-dev",
+  "icon": "resources/icon.png",
   "engines": {
     "vscode": "^1.98.0"
   },
@@ -36,7 +37,7 @@
       "activitybar": [
         {
           "id": "prismaSummary",
-          "title": "PrismaSummary",
+          "title": "Prisma Summary",
           "icon": "resources/icon.svg"
         }
       ]
