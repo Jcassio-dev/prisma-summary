@@ -32,6 +32,7 @@ export class PrismaSummaryProvider
       return Promise.resolve([]);
     }
 
+    // Caso não haja elemento, exibe as categorias
     if (!element) {
       return [
         new CategoryItem("Models", vscode.TreeItemCollapsibleState.Expanded),
@@ -39,8 +40,18 @@ export class PrismaSummaryProvider
       ];
     }
 
+    // Se o elemento é uma categoria, retorna os models ou enums
     if (element instanceof CategoryItem) {
       return this.getModelsOrEnums(prismaFilePath, element.label);
+    }
+
+    // Se o elemento for um Model ou Enum, retorna as propriedades ou valores respectivamente
+    if (element.contextValue === "model") {
+      return this.getModelProperties(prismaFilePath, element.label);
+    }
+
+    if (element.contextValue === "enum") {
+      return this.getEnumValues(prismaFilePath, element.label);
     }
 
     return [];
@@ -83,6 +94,7 @@ export class PrismaSummaryProvider
       return [];
     }
   }
+
   private isRelevantForCategory(line: string, category: string): boolean {
     const categoryKeywords: { [key: string]: string } = {
       Models: "model ",
@@ -97,11 +109,9 @@ export class PrismaSummaryProvider
 
   private extractNameFromLine(line: string): string {
     const parts = line.split(/\s+/);
-
     if (parts.length >= 2) {
       return parts[1].replace("{", "").trim();
     }
-
     return "";
   }
 
@@ -121,8 +131,127 @@ export class PrismaSummaryProvider
     };
 
     return category === "Models"
-      ? new ModelItem(name, vscode.TreeItemCollapsibleState.None, command)
-      : new EnumItem(name, vscode.TreeItemCollapsibleState.None, command);
+      ? new ModelItem(name, vscode.TreeItemCollapsibleState.Collapsed, command)
+      : new EnumItem(name, vscode.TreeItemCollapsibleState.Collapsed, command);
+  }
+
+  private async getModelProperties(
+    prismaFilePath: string,
+    modelName: string
+  ): Promise<PrismaItem[]> {
+    const fileContent = await vscode.workspace.fs.readFile(
+      vscode.Uri.file(prismaFilePath)
+    );
+    const text = Buffer.from(fileContent).toString("utf8");
+    const properties = this.extractModelProperties(text, modelName);
+    return properties.map(
+      (prop) =>
+        new PropertyItem(
+          `${prop.name}: ${prop.type}`,
+          vscode.TreeItemCollapsibleState.None,
+          {
+            command: "vscode.open",
+            title: "",
+            arguments: [
+              vscode.Uri.file(prismaFilePath),
+              { selection: new vscode.Range(prop.line, 0, prop.line, 0) },
+            ],
+          }
+        )
+    );
+  }
+
+  private extractModelProperties(
+    text: string,
+    modelName: string
+  ): { name: string; type: string; line: number }[] {
+    const regex = new RegExp(`model\\s+${modelName}\\s*{([\\s\\S]*?)}`, "m");
+
+    const match = regex.exec(text);
+
+    if (!match) return [];
+
+    const block = match[1];
+    const lines = block.split("\n");
+    const allLines = text.split("\n");
+    const modelStartLine = allLines.findIndex((line) =>
+      line.includes(`model ${modelName}`)
+    );
+
+    const properties: { name: string; type: string; line: number }[] = [];
+
+    let currentLine = modelStartLine + 1;
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith("//") && trimmed !== "}") {
+        const propMatch = /^(\w+)\s+([\w\[\]]+)/.exec(trimmed);
+        if (propMatch) {
+          properties.push({
+            name: propMatch[1],
+            type: propMatch[2],
+            line: currentLine,
+          });
+        }
+      }
+      currentLine++;
+    }
+    return properties;
+  }
+
+  private async getEnumValues(
+    prismaFilePath: string,
+    enumName: string
+  ): Promise<PrismaItem[]> {
+    const fileContent = await vscode.workspace.fs.readFile(
+      vscode.Uri.file(prismaFilePath)
+    );
+    const text = Buffer.from(fileContent).toString("utf8");
+    const values = this.extractEnumValues(text, enumName);
+    return values.map(
+      (val) =>
+        new EnumValueItem(val.value, vscode.TreeItemCollapsibleState.None, {
+          command: "vscode.open",
+          title: "",
+          arguments: [
+            vscode.Uri.file(prismaFilePath),
+            { selection: new vscode.Range(val.line, 0, val.line, 0) },
+          ],
+        })
+    );
+  }
+
+  private extractEnumValues(
+    text: string,
+    enumName: string
+  ): { value: string; line: number }[] {
+    const regex = new RegExp(`enum\\s+${enumName}\\s*{([\\s\\S]*?)}`, "m");
+    const match = regex.exec(text);
+
+    if (!match) return [];
+
+    const block = match[1];
+    const lines = block.split("\n");
+    const allLines = text.split("\n");
+
+    const enumStartLine = allLines.findIndex((line) =>
+      line.includes(`enum ${enumName}`)
+    );
+    const values: { value: string; line: number }[] = [];
+
+    let currentLine = enumStartLine + 1;
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith("//") && trimmed !== "}") {
+        values.push({
+          value: trimmed.replace(",", "").trim(),
+          line: currentLine,
+        });
+      }
+      currentLine++;
+    }
+    return values;
   }
 }
 
@@ -143,7 +272,6 @@ export class CategoryItem extends PrismaItem {
   ) {
     super(label, collapsibleState);
     this.contextValue = "category";
-    
     if (label === "Models") {
       this.iconPath = new vscode.ThemeIcon("database");
     } else if (label === "Enums") {
@@ -158,7 +286,7 @@ export class ModelItem extends PrismaItem {
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly command?: vscode.Command
   ) {
-    super(label, collapsibleState);
+    super(label, collapsibleState, command);
     this.contextValue = "model";
     this.iconPath = new vscode.ThemeIcon("table");
   }
@@ -170,8 +298,32 @@ export class EnumItem extends PrismaItem {
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
     public readonly command?: vscode.Command
   ) {
-    super(label, collapsibleState);
+    super(label, collapsibleState, command);
     this.contextValue = "enum";
     this.iconPath = new vscode.ThemeIcon("symbol-enum-member");
+  }
+}
+
+export class PropertyItem extends PrismaItem {
+  constructor(
+    public readonly label: string,
+    public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+    public readonly command?: vscode.Command
+  ) {
+    super(label, collapsibleState, command);
+    this.contextValue = "property";
+    this.iconPath = new vscode.ThemeIcon("symbol-property");
+  }
+}
+
+export class EnumValueItem extends PrismaItem {
+  constructor(
+    public readonly label: string,
+    public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+    public readonly command?: vscode.Command
+  ) {
+    super(label, collapsibleState, command);
+    this.contextValue = "enumValue";
+    this.iconPath = new vscode.ThemeIcon("symbol-enum");
   }
 }
