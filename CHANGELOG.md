@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.0.5] - 2025-03-18
+## Fixes
+- Put whitespaces between models, enums and other lines
+
 ## [0.0.4] - 2025-03-18
 ### Fixes
 - Enabled the extension to run on versions above 1.75.
