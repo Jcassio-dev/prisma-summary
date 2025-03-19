@@ -14,6 +14,7 @@ export class PrismaContentSorter implements IPrismaContentSorter {
     const enums = text.match(enumRegex) || [];
 
     let remainingText = text;
+
     models.forEach(block => {
       remainingText = remainingText.replace(block, '');
     });
@@ -34,7 +35,11 @@ export class PrismaContentSorter implements IPrismaContentSorter {
     models.sort((a, b) => this.extractName(a).localeCompare(this.extractName(b)));
     enums.sort((a, b) => this.extractName(a).localeCompare(this.extractName(b)));
 
-    return [...otherLines, '', ...models, '', ...enums].join('\n');
+    return [
+      otherLines.join('\n\n'),
+      models.join('\n\n'),
+      enums.join('\n\n')
+    ].join('\n\n');
   }
 
   private extractName(block: string): string {
