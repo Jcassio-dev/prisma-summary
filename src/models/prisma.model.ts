@@ -1,5 +1,3 @@
-export type TBlockType = 'model' | 'enum' | 'other';
-export type TPrismaBlock = string[];
 
 export type TPrismaCategory = 'Models' | 'Enums';
 export type PrismaDefinition = { name: string; lineNumber: number; type: TPrismaCategory };
