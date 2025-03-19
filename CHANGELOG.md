@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [0.0.4] - 2025-03-18
+### Fixes
+- Enabled the extension to run on versions above 1.75.
+
 ## [0.0.3] - 2025-03-16
 ### Added
 - Added a new icon for the extension.
