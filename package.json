@@ -2,7 +2,7 @@
   "name": "prisma-summary",
   "displayName": "prisma-summary",
   "description": "Sort Prisma schema files and navigate through models and enums easily",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "Jcassio-dev",
   "icon": "resources/icon.png",
   "repository": {

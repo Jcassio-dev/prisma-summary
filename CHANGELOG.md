@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+
+## [0.0.6] - 2025-03-18
+## Added
+- Show model and enum props on tree view
+
 ## [0.0.5] - 2025-03-18
 ## Fixes
 - Put whitespaces between models, enums and other lines
