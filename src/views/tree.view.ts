@@ -154,7 +154,9 @@ export class PrismaSummaryProvider
             title: "",
             arguments: [
               vscode.Uri.file(prismaFilePath),
-              { selection: new vscode.Range(prop.line, 0, prop.line, 0) },
+              {
+                selection: new vscode.Range(prop.line, 0, prop.line, 0),
+              },
             ],
           }
         )
@@ -180,7 +182,7 @@ export class PrismaSummaryProvider
 
     const properties: { name: string; type: string; line: number }[] = [];
 
-    let currentLine = modelStartLine + 1;
+    let currentLine = modelStartLine;
 
     for (const line of lines) {
       const trimmed = line.trim();
@@ -239,7 +241,7 @@ export class PrismaSummaryProvider
     );
     const values: { value: string; line: number }[] = [];
 
-    let currentLine = enumStartLine + 1;
+    let currentLine = enumStartLine;
 
     for (const line of lines) {
       const trimmed = line.trim();
